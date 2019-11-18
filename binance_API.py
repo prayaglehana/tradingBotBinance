@@ -17,13 +17,16 @@ import json
 
 symbol='ETHBTC'
 wsymbol='ETH_BTC'
-quantity= 0.05
-thresh=0.00023
+quantity= 0.06
+thresh=0.0002
+
+client = Client('jYtgkaRGbEPDtOW45CzSMHgUqP6fyOjDHf0oK0DN569s2nVfLJvbXXz4L1RLsX6R','O6XKGYLUGhviFJQRyBhVAq5EwpbTQo9BXDRSe7Pec3Lu0w1d5KQoIUQUIPHBAsje') 
+
 
 def getMaxAmount():
     txt=webdriver.find_element_by_xpath('/html/body/div[1]/div/main/div/div/div/div[2]/div[2]/div[2]/div/div[3]/div[1]/form/div[1]/div/div').text
     lst=txt.split(' ')
-    amnt=float(lst[1])
+    amnt=lst[1]
     return amnt
 
 def getCurPrice():
@@ -32,6 +35,7 @@ def getCurPrice():
     return float(req['price'])
 
 def fetchData():
+ try :
     client = Client('jYtgkaRGbEPDtOW45CzSMHgUqP6fyOjDHf0oK0DN569s2nVfLJvbXXz4L1RLsX6R','O6XKGYLUGhviFJQRyBhVAq5EwpbTQo9BXDRSe7Pec3Lu0w1d5KQoIUQUIPHBAsje') 
 
 
@@ -69,9 +73,14 @@ def fetchData():
     fig.add_trace(go.Scatter(x=df['Date'], y=df['LowerBolBand'], mode='lines', name='lines'))
 
 
- 
+  
     fig.update_layout(xaxis_rangeslider_visible=False)
     #fig.show()
+    return df
+ except:
+    data=[]
+    data.append([0,0,0,0,0,0,0,0,0])
+    df = pd.DataFrame(data, columns = ['Date', 'Open','High','Low','Close','mean','stdev','upperBolBand','LowerBolBand'])
     return df
 fetchData()
 options = webdriver.ChromeOptions()
@@ -82,9 +91,9 @@ webdriver = webdriver.Chrome(executable_path=chromedriver_path, options=options)
 sleep(1)
 webdriver.get('https://www.binance.com/en/usercenter/wallet/balances')
 username = webdriver.find_element_by_xpath('//*[@id="login_input_email"]')
-username.send_keys('typeyourusername')
+username.send_keys('')
 password = webdriver.find_element_by_xpath('//*[@id="login_input_password"]')
-password.send_keys('typeyourpassword')
+password.send_keys('')
 
 
 button_login = webdriver.find_element_by_xpath('//*[@id="login_input_login"]')
@@ -92,14 +101,15 @@ button_login.click()
 input("Press Enter to continue...")
 webdriver.get('https://www.binance.com/en/trade/pro/'+wsymbol)
 
-curStatus='bought' 
+curStatus='sold' 
 LastBuyAt=0
 
 while(True):
-    df=fetchData()
+  df=fetchData()
+  if(len(df)>1):
     #print(df)
     curPrice=getCurPrice()
-    if(curPrice<float(df.iloc[len(df)-1]['LowerBolBand']) and curStatus=='sold' ):
+    if( curPrice<float(df.iloc[len(df)-1]['LowerBolBand']) and curStatus=='sold' ):
             
             LastBuyAt=curPrice
             
@@ -115,7 +125,8 @@ while(True):
             amountField.send_keys(Keys.CONTROL + "a")
             amountField.send_keys(Keys.DELETE)
             
-            amountField.send_keys(str(getMaxAmount()))
+            
+            amountField.send_keys(getMaxAmount())
 
             buyButton = webdriver.find_element_by_xpath('//*[@id="orderForm-button-exchangelimitBuy"]')
             buyButton.click()
@@ -125,7 +136,7 @@ while(True):
 
             
             
-    elif(curPrice>float(df.iloc[len(df)-1]['upperBolBand'])and (curPrice-LastBuyAt)>thresh and curStatus=='bought'):
+    elif( curPrice>float(df.iloc[len(df)-1]['upperBolBand'])and (curPrice-LastBuyAt)>thresh and curStatus=='bought'):
         
             priceField=webdriver.find_element_by_xpath('//*[@id="FormRow-SELL-price"]')
             
@@ -146,8 +157,12 @@ while(True):
             
             print('Sell at ',curPrice)
             curStatus='sold'
-
-    sleep(5)
+    
+  #x=client.get_open_orders(symbol=symbol)
+  #print(x)
+  sleep(15)
+  webdriver.refresh()
+  sleep(10)
             
 
 
