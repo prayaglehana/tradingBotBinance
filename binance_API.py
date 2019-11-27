@@ -91,9 +91,9 @@ webdriver = webdriver.Chrome(executable_path=chromedriver_path, options=options)
 sleep(1)
 webdriver.get('https://www.binance.com/en/usercenter/wallet/balances')
 username = webdriver.find_element_by_xpath('//*[@id="login_input_email"]')
-username.send_keys('')
+username.send_keys('xxx2@gmail.com')
 password = webdriver.find_element_by_xpath('//*[@id="login_input_password"]')
-password.send_keys('')
+password.send_keys('xxx')
 
 
 button_login = webdriver.find_element_by_xpath('//*[@id="login_input_login"]')
@@ -101,11 +101,13 @@ button_login.click()
 input("Press Enter to continue...")
 webdriver.get('https://www.binance.com/en/trade/pro/'+wsymbol)
 
-curStatus='sold' 
-LastBuyAt=0
+curStatus='bought' 
+LastBuyAt=0.02155
 
 while(True):
-  df=fetchData()
+
+ df=fetchData()
+ try:
   if(len(df)>1):
     #print(df)
     curPrice=getCurPrice()
@@ -162,7 +164,8 @@ while(True):
   #print(x)
   sleep(15)
   webdriver.refresh()
-  sleep(10)
-            
+  sleep(30)
+ except:
+  sleep(8)
 
 
