@@ -38,9 +38,9 @@ webdriver = webdriver.Chrome(executable_path=chromedriver_path, options=options)
 sleep(1)
 webdriver.get('https://www.binance.com/en/usercenter/wallet/balances')
 username = webdriver.find_element_by_xpath('//*[@id="login_input_email"]')
-username.send_keys('prayag.lehana02@gmail.com')
+username.send_keys('')
 password = webdriver.find_element_by_xpath('//*[@id="login_input_password"]')
-password.send_keys('%Pri545xxx')
+password.send_keys('')
 
 
 button_login = webdriver.find_element_by_xpath('//*[@id="login_input_login"]')
